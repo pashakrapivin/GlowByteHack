@@ -31,9 +31,9 @@ target_encoder_1d = joblib.load('../files/target_encoder_1d')
 features_1d = features_extractor_1d(df, target_encoder_1d)
 
 # Загружаем модель, получаем предикт на 1 сутки
-lgbm_pipeline_1d = joblib.load('../files/lgbm_pipeline_1d')
+stack_pipeline_1d = joblib.load('../files/stack_pipeline_1d')
 predict_1d = pd.DataFrame(
-    lgbm_pipeline_1d.predict(features_1d),
+    stack_pipeline_1d.predict(features_1d),
     index=features_1d.index,
     columns=['target_sum_pred']
 )
@@ -44,8 +44,8 @@ features = features_extractor(df, target_encoder, predict_1d)
 target = target_creator(df, features.index)
 
 # Загружаем модель, получаем предикт на 1 час
-stack_pipeline = joblib.load('../files/stack_pipeline_1h')
-predict = stack_pipeline.predict(features)
+lgbm_pipeline_1h = joblib.load('../files/lgbm_pipeline_1h')
+predict = lgbm_pipeline_1h.predict(features)
 
 
 # Импортируем предикт в файл
@@ -57,4 +57,3 @@ predictions.to_csv('predictions.csv', index=False)
 print(f'MAE: {mean_absolute_error(target, predict)}\n'
       f'MAPE: {mean_absolute_percentage_error(target, predict)}\n'
       f'r2: {r2_score(target, predict)}')
-print(predict)
