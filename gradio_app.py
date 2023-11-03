@@ -1,10 +1,9 @@
 import pandas as pd
 import gradio as gr
-from plotly.callbacks import Points, BoxSelector
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import joblib
 import warnings
+import os
 from sklearn.metrics import mean_absolute_error, r2_score, mean_absolute_percentage_error
 
 from stage_2 import features_extractor
@@ -111,19 +110,31 @@ with gr.Blocks(title='GlowByte Hackaton') as iface:
         )
     with gr.Row():
         with gr.Column(scale=1):
-            file_input = gr.File(file_types=['.csv'], label='Загрузить файл', height=165)
-            option_input = gr.Dropdown([
-                'Этап 1. Предсказание на сутки.',
-                'Этап 2. Предсказание на час.'
-            ], label='Этап хакатона')
+            file_input = gr.File(file_types=['.csv'], label='Загрузить файл', height=100)
+            gr.Examples(
+                examples=[[os.path.join(os.path.dirname(__file__), "data/train_dataset.csv")],
+                          [os.path.join(os.path.dirname(__file__), "data/test_dataset.csv")]],
+                fn=get_predictions,
+                inputs=[file_input],
+                outputs=[], # [df_output, file_output, plot_output, metrics_output],
+                cache_examples=False
+            )
+            option_input = gr.Dropdown(
+                ['Этап 1. Предсказание на сутки.',
+                'Этап 2. Предсказание на час.'],
+                label='Этап хакатона',
+                value='Этап 1. Предсказание на сутки.'
+            )
             btn = gr.Button("Run")
         with gr.Column(scale=2):
-            df_output = gr.Dataframe(label='Predictions',
-                                     col_count=2,
-                                     max_rows=3,
-                                     headers=['datetime', 'predict'],
-                                     height=200,
-                                     show_label=True)
+            df_output = gr.Dataframe(
+                label='Predictions',
+                col_count=2,
+                max_rows=3,
+                headers=['datetime', 'predict'],
+                height=200,
+                show_label=True
+            )
             with gr.Row():
                 with gr.Column(scale=2):
                     metrics_output = gr.Textbox(label='Метрики')
