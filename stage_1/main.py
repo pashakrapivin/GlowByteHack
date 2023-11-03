@@ -39,7 +39,7 @@ predict = lgbm_pipeline.predict(features)
 
 # Импортируем предикт в файл
 predictions = pd.DataFrame()
-predictions['date'] = target.index
+predictions['date'] = features.index
 predictions['predict'] = predict
 predictions.to_csv('predictions.csv', index=False)
 
